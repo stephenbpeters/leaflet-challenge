@@ -17,35 +17,29 @@ function createMap(bikeStations) {
     id: "satellite-v9",
     accessToken: API_KEY
   });
-  // end of this addition
+    // end of this addition
 
   // let's see if we can add a simple layer copied from here: https://leafletjs.com/examples/layers-control/  
   var littleton = L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.'),
-    denver = L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.'),
-    aurora = L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.'),
-    golden = L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.');
+    denver    = L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.'),
+    aurora    = L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.'),
+    golden    = L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.');
 
-  var cities = L.layerGroup([littleton, denver, aurora, golden]);
+    var cities = L.layerGroup([littleton, denver, aurora, golden]);
 
-  // attempting the tectonic plates from example: https://github.com/bigbluey/Visualizing-Data-with-Leaflet
-  var platesURL = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json"
-  var tectonicPlates = new L.LayerGroup();
-
-
-  // Create a baseMaps object to hold our base maps
+  // Create a baseMaps object to hold the lightmap layer
   var baseMaps = {
     "Base Map": lightmap,
     "Satelight": map2
   };
 
-  // Create an overlayMaps object to hold the layers
+  // Create an overlayMaps object to hold the bikeStations layer
   var overlayMaps = {
     "Earthquakes": bikeStations,
-    "Cities": cities,
-    "Fault Lines": tectonicPlates
+    "Cities": cities
   };
 
-  // end of adding layers
+// end of adding layers
 
 
   // Create the map object with options
@@ -63,63 +57,29 @@ function createMap(bikeStations) {
 
   // let us see if I can add our legend here:
   // from https://leafletjs.com/examples/choropleth/
-  var legend = L.control({ position: 'bottomright' });
+      var legend = L.control({position: 'bottomright'});
 
-  legend.onAdd = function (map) {
+    legend.onAdd = function (map) {
 
-    var div = L.DomUtil.create('div', 'info legend'),
-      // grades = [0, 10, 20, 50, 100, 200, 500, 1000],
-      grades = [1, 3, 5, 10, 20, 30, 50, 1000],
-      labels = [];
+        var div = L.DomUtil.create('div', 'info legend'),
+            // grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+            grades = [1, 3, 5, 10, 20, 30, 50, 1000],
+            labels = [];
 
-    // loop through our density intervals and generate a label with a colored square for each interval
-    div.innerHTML += 'Earthquake Depth<br>';
-    for (var i = 0; i < grades.length; i++) {
-      div.innerHTML +=
-        '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + ' km <br>' : '+');
-    }
+        // loop through our density intervals and generate a label with a colored square for each interval
+        div.innerHTML += 'Earthquake Depth<br>' ;
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + ' km <br>' : '+');
+        }
 
-    return div;
-  };
+        return div;
+    };
 
-  legend.addTo(map);
+    legend.addTo(map);
 
-  // let's see if we can run this the same style as the current code:
-  console.log("almost to plate code");
-  // Retrieve platesURL (Tectonic Plates GeoJSON Data) with D3
-  // d3.json(platesURL, function (plateData) {
-  //   // Create a GeoJSON Layer the plateData
-  //   L.geoJson(plateData, {
-  //     color: "#DC143C",
-  //     weight: 2
-  //     // Add plateData to tectonicPlates LayerGroups 
-  //   }).addTo(tectonicPlates);
-  //   // Add tectonicPlates Layer to the Map
-  //   tectonicPlates.addTo(map);
-  //   console.log("ran plates code");
-  // });
 
-  function createPlates(fun) {
-    console.log(fun);
-    d3.json(platesURL, function (plateData) {
-      // Create a GeoJSON Layer the plateData
-      L.geoJson(plateData, {
-        color: "#DC143C",
-        weight: 2
-        // Add plateData to tectonicPlates LayerGroups 
-      }).addTo(tectonicPlates);
-      // Add tectonicPlates Layer to the Map
-      tectonicPlates.addTo(map);
-      console.log("ran plates code");
-    });
-  };
-
-  createPlates("hello from create plates function");
-  function testMe (fun){
-    console.log(fun);
-  }
-  testMe("test function ran");
 }
 
 function createMarkers(response) {
@@ -145,7 +105,7 @@ function createMarkers(response) {
     var mag = stations[index].properties.mag;
     // console.log('mag = ', mag);
     if (depth < 0) { depth = 0; }
-    // console.log('depth = ', depth);
+    console.log('depth = ', depth);
     // var depthColor = 255 - (parseInt(depth) **2)
     // console.log("depth rounded", Math.round(depth));
     // var depthColor = 255 - ((depth * 1.5) ** 1.2);
@@ -169,7 +129,7 @@ function createMarkers(response) {
       // fillColor: '#00' + depthColor.toString(16) + '00',
       fillColor: getColor(depth),
       radius: mag * 6,
-
+    
     }).bindPopup("<h3>Earthquake at: <blockquote>" + title + "</blockquote>Depth: " + depth + " km <br> Magnitude: " + mag + "</h3>");
 
     // // Add the marker to the bikeMarkers array
@@ -183,19 +143,18 @@ function createMarkers(response) {
 
 function getColor(d) {
   return d > 1000 ? '#004529' :
-    d > 50 ? '#006837' :
-      d > 30 ? '#238443' :
-        d > 20 ? '#41ab5d' :
-          d > 10 ? '#78c679' :
-            d > 5 ? '#addd8e' :
-              d > 3 ? '#d9f0a3' :
-                d > 1 ? '#f7fcb9' :
-                  '#ffffe5';
+         d > 50  ? '#006837' :
+         d > 30  ? '#238443' :
+         d > 20  ? '#41ab5d' :
+         d > 10  ? '#78c679' :
+         d > 5   ? '#addd8e' :
+         d > 3   ? '#d9f0a3' :
+         d > 1   ? '#f7fcb9':
+                    '#ffffe5';
 };
+
 
 
 // Perform an API call to the Citi Bike API to get station information. Call createMarkers when complete
 // d3.json("https://gbfs.citibikenyc.com/gbfs/en/station_information.json").then(createMarkers);
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(createMarkers);
-
-// d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(createPlates);
