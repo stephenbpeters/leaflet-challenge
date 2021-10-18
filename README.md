@@ -34,3 +34,5 @@ The USGS provides earthquake data in a number of different formats, updated ever
 * Simply view the index.html file in your favorite web browser.
 
 * You may also view it here: https://stephenbpeters.github.io/leaflet/index.html
+
+* The repository contains all the HTML, CSS and Javascript code to run the project.
